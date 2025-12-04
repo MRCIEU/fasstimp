@@ -15,6 +15,7 @@ p_value_filter_correlation_threshold <- 0.6
 #' - b_cor: The correlation between the true and imputed effect sizes - this is critical for evaluation of the performance of the imputation,
 #'      it should be close to 1 e.g > 0.7 would be a reasonable threshold
 #' - se_cor: The correlation between the true and imputed standard errors
+#' @export
 perform_imputation <- function(gwas, pc, thresh=0.9, eval_frac=0.5) {
   unaltered_gwas <- gwas
   b <- gwas$BETA
