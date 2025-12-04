@@ -2,23 +2,40 @@
 % Please edit documentation in R/fasstimp.r
 \name{filter_imputation_results}
 \alias{filter_imputation_results}
-\title{filter_imputation_results: remove results with over-inflated p-vlaues}
+\title{Filter imputation results to remove artifacts}
 \usage{
-filter_imputation_results(gwas, ld_matrix, min_bp, max_bp)
+filter_imputation_results(
+  gwas,
+  ld_matrix,
+  min_bp,
+  max_bp,
+  lowest_p_value_threshold = 5e-08,
+  min_p_gwas = 1e-10
+)
 }
 \arguments{
-\item{imputed}{gwas}
+\item{gwas}{A data frame of GWAS summary statistics, including imputed values.}
 
-\item{ld}{correlation matrix
+\item{ld_matrix}{The LD correlation matrix for the region.}
 
-First, filters the imputation results to inside the range of the original gwas
-Second, finds imputed variants with low pvalues, non-imputed rows that are correlated
-If imputed variant is more significant the non-imputed rows, drop that variant.
-Also, if the imputed variant has an illegal value, drop that variant.}
+\item{min_bp}{Minimum base pair position to keep.}
+
+\item{max_bp}{Maximum base pair position to keep.}
+
+\item{lowest_p_value_threshold}{Threshold for investigating potentially inflated p-values (default: 5e-8).}
+
+\item{min_p_gwas}{Minimum p-value allowed if no correlated SNPs are found (default: 1e-10).}
 }
 \value{
-filtered gwas
+A list containing:
+\itemize{
+\item gwas: The filtered GWAS data frame.
+\item significant_rows_imputed: Number of significant imputed rows investigated.
+\item significant_rows_filtered: Number of significant imputed rows removed.
+}
 }
 \description{
-filter_imputation_results: remove results with over-inflated p-vlaues
+First, filters the imputation results to inside the range of the original gwas.
+Second, finds imputed variants with low p-values and checks their consistency with correlated non-imputed variants.
+If an imputed variant is significantly more associated than its correlated observed variants, it is likely an artifact and is removed.
 }

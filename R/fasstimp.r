@@ -232,17 +232,26 @@ set_se_outliers_missing <- function(se, se_imputed, outthresh = 3) {
   return(i)
 }
 
-#' filter_imputation_results: remove results with over-inflated p-vlaues
+#' Filter imputation results to remove artifacts
 #' 
-#' @param imputed gwas
-#' @param ld correlation matrix
+#' @param gwas A data frame of GWAS summary statistics, including imputed values.
+#' @param ld_matrix The LD correlation matrix for the region.
+#' @param min_bp Minimum base pair position to keep.
+#' @param max_bp Maximum base pair position to keep.
+#' @param lowest_p_value_threshold Threshold for investigating potentially inflated p-values (default: 5e-8).
+#' @param min_p_gwas Minimum p-value allowed if no correlated SNPs are found (default: 1e-10).
 #' 
-#' First, filters the imputation results to inside the range of the original gwas
-#' Second, finds imputed variants with low pvalues, non-imputed rows that are correlated
-#' If imputed variant is more significant the non-imputed rows, drop that variant.
-#' Also, if the imputed variant has an illegal value, drop that variant.
-#' @return filtered gwas
-filter_imputation_results <- function(gwas, ld_matrix, min_bp, max_bp) {
+#' @description
+#' First, filters the imputation results to inside the range of the original gwas.
+#' Second, finds imputed variants with low p-values and checks their consistency with correlated non-imputed variants.
+#' If an imputed variant is significantly more associated than its correlated observed variants, it is likely an artifact and is removed.
+#' 
+#' @return A list containing:
+#' - gwas: The filtered GWAS data frame.
+#' - significant_rows_imputed: Number of significant imputed rows investigated.
+#' - significant_rows_filtered: Number of significant imputed rows removed.
+#' @export
+filter_imputation_results <- function(gwas, ld_matrix, min_bp, max_bp, lowest_p_value_threshold = 5e-8, min_p_gwas = 1e-10) {
   only_keep_inside_gwas_range <- gwas$BP > min_bp & gwas$BP < max_bp 
   gwas <- gwas[only_keep_inside_gwas_range, ]
 
